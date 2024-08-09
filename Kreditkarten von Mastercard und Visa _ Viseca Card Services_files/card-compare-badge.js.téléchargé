@@ -1,0 +1,39 @@
+$(document).ready(function () {
+    $("div").find("[data-table-holder-badge]").addClass("container");
+
+    var selectedValue = $(".card-compare-badge-dropdown-mobile-select").val();
+    $("div").find("[data-table-holder-badge]").find(".js-mobile-table-column").hide();
+    $("h4").filter(function () { return $(this).text() == selectedValue }).closest(".js-mobile-table-column").show();
+});
+
+function getDropdownSelectedValueBadge() {
+    $(document).on("change", ".card-compare-badge-dropdown-mobile-select", function () {
+        $("div").find("[data-table-holder-badge]").addClass("container");
+
+        var selectedValue = this.options[this.selectedIndex].value;
+        $("div").find("[data-table-holder-badge]").find(".js-mobile-table-column").hide();
+        $("h4").filter(function () { return $(this).text() == selectedValue }).closest(".js-mobile-table-column").show();
+    });
+}
+
+function showOrderButtonsBadge(button, e) {
+    e.preventDefault();
+
+    var link = $(button).attr("data-link");
+    var linkName = $(button).attr("data-link-name");
+    var secondLink = $(button).attr("data-second-link");
+    var secondLinkName = $(button).attr("data-second-link-name");
+
+    $("#orderButton1").attr("href", link);
+    $("#orderButton1").text(linkName);
+    $("#orderButton2").attr("href", secondLink);
+    $("#orderButton2").text(secondLinkName);
+
+    $("#card-order-overlay").removeClass("card-order-overlay-hidden");
+}
+
+function hideOrderButtonsBadge(button, e) {
+    e.preventDefault();
+
+    $("#card-order-overlay").addClass("card-order-overlay-hidden");
+}

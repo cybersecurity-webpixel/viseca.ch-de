@@ -1,0 +1,101 @@
+var email_regex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
+ 
+window.onload = function(){document.getElementById("aspnetForm").onsubmit = validateForm;}
+ 
+function validateForm(e){
+    var error_message = validateFields();
+ 
+    if(error_message !== ""){
+        e.preventDefault();
+        alert(error_message);
+    }
+}
+ 
+//Add your field validation to this function
+function validateFields() {
+    var result = "";
+    result += validateEmails();
+    result += validateIntegerMin();
+    result += validateIntegerMax();
+    return result;
+}
+ 
+//Gets all fields with js-validation-min-XXX and validates that the input value is >= XX
+function validateIntegerMin() {
+    var val, min, matches, str = "";
+    var inputs = document.getElementsByClassNameWildcard("js-validation-min-");
+    for(var i=0; i<inputs.length; i++){
+        matches = inputs[i].className.match(/(\s|^)(js-validation-min-)(\d+)/);
+        if(matches){
+            val = Number(inputs[i].value);
+            min = Number(matches[3]);
+            if(val < min) str = addError(str, "The value must be at least "+min, inputs[i]);
+        }
+    }
+    return str;
+}
+ 
+//Gets all fields with js-validation-max-XXX and validates that the input value is <= XX
+function validateIntegerMax() {
+    var val, max, matches, str = "";
+    var inputs = document.getElementsByClassNameWildcard("js-validation-max-");
+    for(var i=0; i<inputs.length; i++){
+        matches = inputs[i].className.match(/(\s|^)(js-validation-max-)(\d+)/);
+        if(matches){
+            val = Number(inputs[i].value);
+            max = Number(matches[3]);
+            if(val > max) str = addError(str, "The value cannot be greater than "+max, inputs[i]);
+        }
+    }
+    return str;
+}
+ 
+//Gets all fields with js-validation-email class and performs regex validation
+function validateEmails() {
+    var val, str = "";
+    var inputs = document.getElementsByClassName("js-validation-email");
+    for(var i=0; i<inputs.length; i++){
+        val = inputs[i].value;
+        if(val === "") str = addError(str, "You must provide an email address.", inputs[i]);
+        else if(!val.match(email_regex)) str = addError(str, "Address '"+val+"' is not valid!", inputs[i]);
+    }
+    return str;
+}
+ 
+function addError(str, msg, element) {
+    str += "\u2022";
+    if(element !== undefined && element !== null){
+        var label = findLableForControl(element);
+        if(label !== undefined && label !== null) {
+            str += label.innerHTML;
+            if(!str.endsWith(":")) str += ":";
+        }
+    }
+    str += " "+msg+"\n"; //Change '\n' to '<br/>' if displaying error message in HTML
+    return str;
+}
+ 
+function findLableForControl(el) {
+    var idVal = el.id;
+    var labels = document.getElementsByTagName('label');
+    for( var i = 0; i < labels.length; i++ ) {
+        if (labels[i].htmlFor == idVal) return labels[i];
+    }
+}
+ 
+//Custom function used to select elements with classnames using regex
+document['getElementsByClassNameWildcard'] = function(str){
+   var arrElements = [];
+ 
+   function findRecursively(aNode) {
+      if (!aNode) 
+          return;
+      if (aNode.className !== undefined && aNode.className.indexOf(str) !== -1)
+          arrElements.push(aNode);
+      for (var idx in aNode.childNodes)
+          findRecursively(aNode.childNodes[idx]);
+   };
+ 
+   findRecursively(document);
+   return arrElements;
+};
